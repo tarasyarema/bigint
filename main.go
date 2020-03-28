@@ -7,14 +7,28 @@ import (
 	"time"
 )
 
-// Inspiration: https://en.wikipedia.org/wiki/Multiplication_algorithm#Optimizing_space_complexity
+// Min returns the min
+func Min(x, y int) int {
+	if x < y {
+		return x
+	}
+	return y
+}
+
+// Max returns the max
+func Max(x, y int) int {
+	if x > y {
+		return x
+	}
+	return y
+}
 
 // BigInt is the generic BigInt struct
 type BigInt struct {
 	// the array data
-	d []int
+	d []uint
 	// the base
-	b int
+	b uint
 }
 
 // Multiply multiplies to BigInts
@@ -23,12 +37,12 @@ func (x BigInt) Multiply(y BigInt) (BigInt, error) {
 		return BigInt{}, fmt.Errorf("bases of x and y are not the same: %d, %d", x.b, y.b)
 	}
 
-	total := 0
+	total := uint(0)
 
 	p, q := len(x.d), len(y.d)
 	base := x.b
 
-	prod := make([]int, p+q)
+	prod := make([]uint, p+q)
 
 	for i := 0; i < p+q-1; i++ {
 		jMin := Max(0, i-p+1)
@@ -52,7 +66,7 @@ func (x BigInt) String() string {
 	s := ""
 
 	for i := len(x.d) - 1; i >= 0; i-- {
-		s += strconv.Itoa(x.d[i])
+		s += strconv.Itoa(int(x.d[i]))
 	}
 
 	return strings.TrimLeftFunc(s, func(r rune) bool {
@@ -65,12 +79,12 @@ func (x BigInt) String() string {
 }
 
 // InitBigInt inits a BigInt from a string
-func InitBigInt(s string, b int) (BigInt, error) {
+func InitBigInt(s string, b uint) (BigInt, error) {
 	if b <= 1 {
 		return BigInt{}, fmt.Errorf("base is not positive: %v", b)
 	}
 
-	a := make([]int, len(s))
+	a := make([]uint, len(s))
 
 	for i := 0; i < len(a); i++ {
 		x, err := strconv.Atoi(fmt.Sprintf("%c", s[i]))
@@ -79,15 +93,15 @@ func InitBigInt(s string, b int) (BigInt, error) {
 			return BigInt{}, err
 		}
 
-		a[len(a)-i-1] = x
+		a[len(a)-i-1] = uint(x)
 	}
 
-	return BigInt{a, b}, nil
+	return BigInt{a, uint(b)}, nil
 }
 
 func factorial(n int) (BigInt, error) {
-	base := 10
-	x := BigInt{[]int{1}, base}
+	base := uint(10)
+	x := BigInt{[]uint{1}, base}
 
 	for i := 2; i <= n; i++ {
 		y, err := InitBigInt(strconv.Itoa(i), base)
@@ -117,6 +131,6 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("%d! = %v\n", n, f)
-	fmt.Printf("elapsed: %v\n", elapsed)
+	fmt.Printf("%d! has %v digits\n", n, len(f.String()))
+	fmt.Printf("Elapsed: %v\n", elapsed)
 }
